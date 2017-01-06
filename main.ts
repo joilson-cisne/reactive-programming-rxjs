@@ -10,14 +10,28 @@ const load = (url: string) => {
         let xhr = new XMLHttpRequest();
 
         xhr.addEventListener('load', () => {
-            let data = JSON.parse(xhr.responseText);
-            observer.next(data);
-            observer.complete();
+            if (xhr.status === 200) {
+                let data = JSON.parse(xhr.responseText);
+                observer.next(data);
+                observer.complete();
+            } else {
+                observer.error(xhr.responseText);
+            }
         });
 
         xhr.open('GET', url);
         xhr.send();
-    });
+    }).retryWhen(retryStrategy);
+};
+
+const retryStrategy = (errors) => {
+    return errors
+        .scan((acc, value) => {
+            console.log(acc, value);
+            return acc + 1
+        }, 0)
+        .takeWhile(acc => acc < 4)
+        .delay(1000);
 };
 
 const renderMovies = (movies) => {
@@ -28,7 +42,7 @@ const renderMovies = (movies) => {
     });
 }
 
-click.flatMap(event => load('movies.json'))
+click.flatMap(event => load('moviess.json'))
     .subscribe(
         renderMovies,
         err => console.log(`error: ${err}`),
