@@ -21,17 +21,19 @@ const load = (url: string) => {
 
         xhr.open('GET', url);
         xhr.send();
-    }).retryWhen(retryStrategy);
+    }).retryWhen(retryStrategy({attemps: 3, delay: 2000}));
 };
 
-const retryStrategy = (errors) => {
-    return errors
-        .scan((acc, value) => {
-            console.log(acc, value);
-            return acc + 1
-        }, 0)
-        .takeWhile(acc => acc < 4)
-        .delay(1000);
+const retryStrategy = ({attemps = 4, delay = 1000}) => {
+    return (errors) => {
+        return errors
+            .scan((acc, value) => {
+                console.log(acc, value);
+                return acc + 1
+            }, 0)
+            .takeWhile(acc => acc < attemps)
+            .delay(delay);
+    };
 };
 
 const renderMovies = (movies) => {
