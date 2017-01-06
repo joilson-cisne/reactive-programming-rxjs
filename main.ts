@@ -44,7 +44,7 @@ const renderMovies = (movies) => {
     });
 }
 
-click.flatMap(event => load('moviess.json'))
+click.flatMap(event => load('movies.json'))
     .subscribe(
         renderMovies,
         err => console.log(`error: ${err}`),
