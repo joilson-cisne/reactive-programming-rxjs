@@ -22,19 +22,29 @@ export const load = (url: string) => {
 export const loadWithFetch = (url: string) => {
     return Observable.defer(() => {
         return Observable.fromPromise(
-            fetch(url).then(res => res.json())
+            fetch(url).then(res => {
+                if (res.status === 200) {
+                    return res.json();
+                } else {
+                    return Promise.reject(res);
+                }
+            })
         );
-    });
+    }).retryWhen(retryStrategy());
 };
 
-const retryStrategy = ({attemps = 4, delay = 1000}) => {
+const retryStrategy = ({attemps = 4, delay = 1000} = {}) => {
     return (errors) => {
         return errors
             .scan((acc, value) => {
-                console.log(acc, value);
-                return acc + 1
+                ++acc;
+                
+                if (acc < attemps) {
+                    return acc;
+                } else {
+                    throw new Error(value);
+                }
             }, 0)
-            .takeWhile(acc => acc < attemps)
             .delay(delay);
     };
 };

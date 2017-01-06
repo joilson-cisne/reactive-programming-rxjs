@@ -1,38 +1,29 @@
 import {Observable} from 'rxjs';
 import {load, loadWithFetch} from "./loaders";
 
-let source = Observable.merge(
-    Observable.of(1),
-    Observable.from([2, 3, 4]),
-    Observable.throw(new Error('Stop!')),
-    Observable.of(5)
-).catch(err => {
-    console.log(`catch: ${err}`);
-    return Observable.of(10);
-});
+let output = document.getElementById('output');
+let button = document.getElementById('button');
 
-source.subscribe(
-    value => console.log(`value: ${value}`),
-    err => console.log(`value: ${err}`),
-    () => console.log('complete')
-);
+let click = Observable.fromEvent(button, 'click');
 
-// let output = document.getElementById('output');
-// let button = document.getElementById('button');
+const renderMovies = (movies) => {
+    movies.forEach(m => {
+        let div = document.createElement('div');
+        div.innerHTML = m.title;
+        output.appendChild(div);
+    });
+}
 
-// let click = Observable.fromEvent(button, 'click');
+loadWithFetch('moviess.json')
+    .subscribe(
+        renderMovies,
+        err => console.log(`error: ${err}`),
+        () => console.log('complete!')
+    );
 
-// const renderMovies = (movies) => {
-//     movies.forEach(m => {
-//         let div = document.createElement('div');
-//         div.innerHTML = m.title;
-//         output.appendChild(div);
-//     });
-// }
-
-// click.flatMap(event => loadWithFetch('movies.json'))
-//     .subscribe(
-//         renderMovies,
-//         err => console.log(`error: ${err}`),
-//         () => console.log('complete')
-//     );
+click.flatMap(event => loadWithFetch('movies.json'))
+    .subscribe(
+        renderMovies,
+        err => console.log(`error: ${err}`),
+        () => console.log('complete')
+    );
