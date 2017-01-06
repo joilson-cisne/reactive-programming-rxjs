@@ -1,7 +1,7 @@
 import {Observable} from 'rxjs';
 import {load, loadWithFetch} from "./loaders";
 
-let source = Observable.merge(
+let source = Observable.onErrorResumeNext(
     Observable.of(1),
     Observable.from([2, 3, 4]),
     Observable.throw(new Error('Stop!')),
