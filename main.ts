@@ -1,12 +1,15 @@
 import {Observable} from 'rxjs';
 import {load, loadWithFetch} from "./loaders";
 
-let source = Observable.onErrorResumeNext(
+let source = Observable.merge(
     Observable.of(1),
     Observable.from([2, 3, 4]),
     Observable.throw(new Error('Stop!')),
     Observable.of(5)
-);
+).catch(err => {
+    console.log(`catch: ${err}`);
+    return Observable.of(10);
+});
 
 source.subscribe(
     value => console.log(`value: ${value}`),
