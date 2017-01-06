@@ -1,7 +1,8 @@
-// import {Observable} from 'rxjs';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/filter';
+import {Observable} from 'rxjs';
+
+// import {Observable} from 'rxjs/Observable';
+// import 'rxjs/add/operator/map';
+// import 'rxjs/add/operator/filter';
 
 let numbers = [10, 20, 40];
 
