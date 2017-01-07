@@ -4,7 +4,7 @@ export const load = (url: string) => {
     return Observable.create(observer => {
         let xhr = new XMLHttpRequest();
 
-        xhr.addEventListener('load', () => {
+        const onLoad = () => {
             if (xhr.status === 200) {
                 let data = JSON.parse(xhr.responseText);
                 observer.next(data);
@@ -12,10 +12,18 @@ export const load = (url: string) => {
             } else {
                 observer.error(xhr.responseText);
             }
-        });
+        };
+
+        xhr.addEventListener('load', onLoad);
 
         xhr.open('GET', url);
         xhr.send();
+
+        return () => {
+            console.log('cleanup');
+            xhr.removeEventListener('load', onLoad);
+            xhr.abort();
+        };
     }).retryWhen(retryStrategy({attemps: 3, delay: 2000}));
 };
 
@@ -38,7 +46,7 @@ const retryStrategy = ({attemps = 4, delay = 1000} = {}) => {
         return errors
             .scan((acc, value) => {
                 ++acc;
-                
+
                 if (acc < attemps) {
                     return acc;
                 } else {
